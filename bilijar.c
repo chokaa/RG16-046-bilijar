@@ -8,31 +8,54 @@ static void on_reshape(int width, int height);
 static void on_display(void);
 
 #define TIMER 100
-#define TIMER_LOPTE 20
+#define TIMER_BELE 10
+#define TIMER_LOPTE 25
+#define TIMER_UDARENA 25
 #define TIMER_ID 1
 #define TIMER_ID_BELA 2
 #define TIMER_ID_OSTALE 3
 
 static void onTimer(int id);
+static void onTimerBela(int id);
+static void onTimerOstale(int id);
 
-static float ugao = 0;
+static int intenzitet = 1750;
+static int duzina_stola = 11;
+static int sirina_stola = 7;
 
-static float pozicija_stapa = -4.5;
 
+
+static float pozicija_stapa = -2.5;
+static float duzina_stapa = 2.9;
 static int ugao_kretanja = 0;
 
-static float pozicija_bela_z = -1.5;
-static float pozicija_crvena_z = 3.6;
-static float pozicija_plava_z = 4.0;
-static float pozicija_zelena_z = 3.8;
-static float pozicija_zuta_z = 3.8;
+static float vektor_x = 0.001;
+static float vektor_z = 0.1;
 
-static float pozicija_bela_x = 0;
-static float pozicija_crvena_x = 0;
-static float pozicija_plava_x = 0;
-static float pozicija_zelena_x = -0.4;
-static float pozicija_zuta_x = 0.4;
+  static float pozicija_bela_z = 0.5;
+  static float pozicija_crvena_z = 7;
+  /*
+  static float pozicija_plava_z = 4.0;
+  static float pozicija_zelena_z = 3.8;
+  static float pozicija_zuta_z = 3.8;
+  */
+  static float pozicija_bela_x = 3.5;
+  static float pozicija_crvena_x = 3.5;
+  /*
+  static float pozicija_plava_x = 0;
+  static float pozicija_zelena_x = -0.4;
+  static float pozicija_zuta_x = 0.4;
+  */
+  static int odbijena = 0;
+  
+  
+  static void pomeriBelu(int x,int z){
+    /*pozicija_bela_z+=0.1;*/  
 
+    glutTimerFunc(TIMER_BELE, onTimerBela, TIMER_ID_BELA);
+    glutPostRedisplay();
+  
+}
 
 static void onTimerOstale(int id){
     if (id != TIMER_ID_OSTALE) {
@@ -40,15 +63,12 @@ static void onTimerOstale(int id){
     }
     
     
-    if(pozicija_zelena_z < 7 && pozicija_zelena_x > -3){
+/*    if(pozicija_zelena_z < 7 && pozicija_zelena_x > -3){
       pozicija_zelena_z+=0.1;
       pozicija_zelena_x-=0.1;
     }
     
-    if(pozicija_crvena_z < 7 && pozicija_zelena_x < 3){
-      pozicija_crvena_z+=0.1;
-      pozicija_crvena_x+=0.05;
-    }
+
 
     if(pozicija_plava_z < 7 && pozicija_plava_x > -3){
       pozicija_plava_z+=0.1;
@@ -59,9 +79,57 @@ static void onTimerOstale(int id){
       pozicija_zuta_z+=0.1;
       pozicija_zuta_x+=0.1;
     }
+
+    if(((pozicija_crvena_z+0.1) == (pozicija_bela_z-0.1)) || ((pozicija_crvena_z-0.1) == (pozicija_bela_z+0.1)) || 
+       ((pozicija_crvena_x+0.1) == (pozicija_bela_x-0.1)) || ((pozicija_crvena_x-0.1) == (pozicija_bela_x+0.1))
+    ){
     
-    glutPostRedisplay();
-    glutTimerFunc(TIMER_LOPTE, onTimer, TIMER_ID);
+*/  
+
+    if(intenzitet >0){
+      /*
+      intenzitet-=0.1;
+      if((pozicija_crvena_z+0.2)<=duzina_stola && (vektor_z>0) && ((pozicija_crvena_x+0.2)<=sirina_stola) ){
+	pozicija_crvena_z += vektor_z;
+	pozicija_crvena_x += vektor_x;
+	glutPostRedisplay();
+      }
+      else{
+	odbijena=1;
+	pozicija_crvena_z -= vektor_z;
+	pozicija_crvena_x += vektor_x;
+	glutPostRedisplay();
+      }
+      */
+      
+      intenzitet-=0.1;
+      
+      if((pozicija_crvena_x+0.2) >= sirina_stola)
+	vektor_x = vektor_x * (-1);
+      if((pozicija_crvena_x-0.2) <= 0)
+	vektor_x = vektor_x * (-1);
+      if((pozicija_crvena_z+0.2) >= duzina_stola)
+	vektor_z = vektor_z * (-1);
+      if((pozicija_crvena_z+0.2) <= 0)
+	vektor_z = vektor_z * (-1);
+      
+      pozicija_crvena_z += vektor_z;
+      pozicija_crvena_x += vektor_x;
+      glutPostRedisplay();
+      
+      
+      /*
+      if(pozicija_crvena_z <= (pozicija_bela_z+0.2) && ((pozicija_crvena_z+0.2)<=duzina_stola) && (pozicija_bela_x > sirina_stola || pozicija_bela_x < 0) ){
+	vektor_x =  (pozicija_bela_x - pozicija_crvena_x);
+	vektor_z = (pozicija_bela_z - pozicija_crvena_z);
+	glutTimerFunc(TIMER_LOPTE,onTimerBela,TIMER_ID_BELA);
+      }
+      
+       * pozicija_crvena_x -= vektor_x;
+      */
+    }
+    
+      glutTimerFunc(TIMER_LOPTE, onTimerOstale, TIMER_ID_OSTALE);
 }
 
 static void onTimerBela(int id)
@@ -69,12 +137,31 @@ static void onTimerBela(int id)
     if (id != TIMER_ID_BELA) {
         return;
     }
-    pozicija_bela_z+=0.1;
-    if(pozicija_bela_z < 3.3){
-    pozicija_bela_z+=0.1;
-    glutPostRedisplay();
-    glutTimerFunc(TIMER_LOPTE, onTimer, TIMER_ID);
+    
+    if((pozicija_bela_z <= (pozicija_crvena_z-0.2)) && (intenzitet>0)  ){
+      intenzitet-=0.1;
+      if(!(odbijena)){
+      pozicija_bela_x +=vektor_x;
+      pozicija_bela_z +=vektor_z;
+      }
+      else{
+	 pozicija_bela_x -=vektor_x;
+	 pozicija_bela_z -=vektor_z;
+      }
+      pomeriBelu(pozicija_bela_x,pozicija_bela_z);
+      glutPostRedisplay();
     }
+    
+    if((pozicija_bela_z >= (pozicija_crvena_z-0.2))){
+      vektor_x =  (pozicija_crvena_x - pozicija_bela_x);
+      vektor_z = (pozicija_crvena_z - pozicija_bela_z);
+      glutTimerFunc(TIMER_LOPTE,onTimerOstale,TIMER_ID_OSTALE);
+    }
+    
+    
+    
+    
+    /*glutTimerFunc(TIMER_LOPTE, onTimerOstale, TIMER_ID);*/
 }
 
 static void onTimer(int id)
@@ -82,20 +169,30 @@ static void onTimer(int id)
     if (id != TIMER_ID) {
         return;
     }
+    if((pozicija_stapa+duzina_stapa) < (pozicija_bela_z)){
     ugao_kretanja+=1;
-    if(pozicija_stapa < -4.4){
     pozicija_stapa -= sin(ugao_kretanja);
     glutPostRedisplay();
     glutTimerFunc(TIMER, onTimer, TIMER_ID);
     }
-    if(pozicija_stapa > -4.4 && pozicija_bela_z < 5){
+    else{
+
       glutTimerFunc(TIMER_LOPTE,onTimerBela,TIMER_ID_BELA);
     }
-    if(pozicija_bela_z > 3.25){
+/*
+    if((pozicija_stapa+3.0) > (pozicija_bela_z) ){
+      glutTimerFunc(TIMER_LOPTE,onTimerBela,TIMER_ID_BELA);
+    }
+
+    if(pozicija_bela_z > 6.25){
       glutTimerFunc(TIMER_LOPTE,onTimerOstale,TIMER_ID_OSTALE);
     }
-}
+*/
 
+    
+
+}
+static int udarena = 1;
 
 int main(int argc, char **argv)
 {
@@ -133,7 +230,10 @@ static void on_keyboard(unsigned char key, int x, int y)
 
     case 'g':
     case 'G':
-        glutTimerFunc(TIMER,onTimer,TIMER_ID);
+	if(udarena){
+	  glutTimerFunc(TIMER,onTimer,TIMER_ID);
+	  udarena=0;
+	}
         break;
     }
 }
@@ -181,7 +281,7 @@ static void on_display(void)
     /* Podesava se vidna tacka. */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, 8, -5, 0, 0, 0, 0, 1, 0);
+    gluLookAt(3, 10, -5, 3, 0, 3, 0, 1, 0);
 
     /* Ukljucuje se osvjetljenje i podesavaju parametri svetla. */
     glEnable(GL_LIGHTING);
@@ -207,23 +307,112 @@ static void on_display(void)
     glTranslatef(0.0,0.0,-1.5);
     glBegin(GL_POLYGON); 
     glColor3d(0.0,1.0,0.4);
-    glVertex3f(-3.5, -0.5,  10.0);
-    glVertex3f(3.5, -0.5,  10.0);
-    glVertex3f(3.5, -0.5, -1.0); 
-    glVertex3f(-3.5, -0.5, -1.0);
+    glVertex3f(0.0, -0.5,  13);
+    glVertex3f(7.0, -0.5,  13);
+    glVertex3f(7.0, -0.5, 1.5); 
+    glVertex3f(0.0, -0.5, 1.5);
     glEnd();
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(0.0,0.0,-1.5);
+    glBegin(GL_POLYGON); 
+    glColor3d(0.405,0.133,0.063);
+    glVertex3f(-1.0, -0.7,  1.6);
+    glVertex3f(8.0, -0.7,  1.6);
+    glVertex3f(6.5, -0.7, 0.6); 
+    glVertex3f(0.5, -0.7, 0.6);
+    glEnd();
+    glFlush();
+    glPopMatrix();
+    
+    
+    glPushMatrix();
+    glTranslatef(0.0,0.0,-1.5);
+    glBegin(GL_POLYGON); 
+    glColor3d(0.405,0.133,0.063);
+    glVertex3f(-1.0, -0.7,  1.6);
+    glVertex3f(-1.0, -0.7,  16.6);
+    glVertex3f(0, -0.7, 16.6); 
+    glVertex3f(0, -0.7, 1.6);
+    glEnd();
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(0.0,0.0,-1.5);
+    glBegin(GL_POLYGON); 
+    glColor3d(0.405,0.133,0.063);
+    glVertex3f(7.0, -0.7,  1.6);
+    glVertex3f(7.0, -0.7,  16.6);
+    glVertex3f(8, -0.7, 16.6); 
+    glVertex3f(8, -0.7, 1.6);
+    glEnd();
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(0.0,0.0,-1.5);
+    glBegin(GL_POLYGON); 
+    glColor3d(0.405,0.133,0.063);
+    glVertex3f(0.0, -0.7,  16.6);
+    glVertex3f(7.0, -0.7,  16.6);
+    glVertex3f(7, -0.7, 11.6); 
+    glVertex3f(0, -0.7, 11.6);
+    glEnd();
+    glFlush();
+    glPopMatrix();
+    
+    /* Crtanje rupa */
+    glPushMatrix();
+    glTranslatef(0.0,-0.5,0.0);
+    glColor3f(0,0,0);
+    glutSolidSphere(0.2,50,50);
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(7.0,-0.5,0.0);
+    glColor3f(0,0,0);
+    glutSolidSphere(0.2,50,50);
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(0.0,-0.5,6.0);
+    glColor3f(0,0,0);
+    glutSolidSphere(0.2,50,50);
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(7.0,-0.5,6.0);
+    glColor3f(0,0,0);
+    glutSolidSphere(0.2,50,50);
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(0.0,-0.5,11.5);
+    glColor3f(0,0,0);
+    glutSolidSphere(0.2,50,50);
+    glFlush();
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslatef(7.0,-0.5,11.5);
+    glColor3f(0,0,0);
+    glutSolidSphere(0.2,50,50);
     glFlush();
     glPopMatrix();
 
     /*crtanje stapa*/
     glPushMatrix();
-    glTranslatef(0.0,0.1,pozicija_stapa);
-    
-    glColor3f(0.5,0.3,0.0);
+    glTranslatef(3.5,0.1,pozicija_stapa);
+    glColor3f(0.5,0.25,0.0);
     GLUquadric* qobj = gluNewQuadric();
-    
-    gluCylinder(qobj,0.1,0.01,3,10,10);
-    
+    gluCylinder(qobj,0.1,0.015,3,10,10);
     glFlush();
     glPopMatrix();
     
@@ -242,6 +431,7 @@ static void on_display(void)
     glFlush();
     glPopMatrix();
 
+    /*
     glPushMatrix();
     glTranslatef(pozicija_plava_x,0.0,pozicija_plava_z);
     glColor3f(0, 0, 1);
@@ -263,7 +453,7 @@ static void on_display(void)
     glFlush();
     glPopMatrix();
     
-    
+    */
     
     /* Nova slika se salje na ekran. */
     glutSwapBuffers();

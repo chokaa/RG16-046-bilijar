@@ -7,30 +7,38 @@ static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 static void on_display(void);
 
-#define TIMER 100
-#define TIMER_BELE 10
-#define TIMER_LOPTE 25
-#define TIMER_UDARENA 25
+
 #define TIMER_ID 1
 #define TIMER_ID_BELA 2
 #define TIMER_ID_OSTALE 3
+
+static int rupe = 0;
+
+static int TIMER = 100;
+static int TIMER_BELE =25;
+static int TIMER_LOPTE =25;
+static int TIMER_UDARENA =25;
 
 static void onTimer(int id);
 static void onTimerBela(int id);
 static void onTimerOstale(int id);
 
-static int intenzitet = 1750;
+static int intenzitet_bela = 1700000000;
+static int intenzitet_crvena = 1700000000;
 static int duzina_stola = 11;
 static int sirina_stola = 7;
 
+static int pozvane_ostale = 1;
 
-
-static float pozicija_stapa = -2.5;
-static float duzina_stapa = 2.9;
+static float pozicija_stapa = -0.4;
+static float duzina_stapa = 3.0;
 static int ugao_kretanja = 0;
 
-static float vektor_x = 0.001;
-static float vektor_z = 0.1;
+static float vektor_x_bela = 0.1;
+static float vektor_z_bela = 0.1;
+
+static float vektor_x_crvena = 0;
+static float vektor_z_crvena = 0;
 
   static float pozicija_bela_z = 0.5;
   static float pozicija_crvena_z = 7;
@@ -46,89 +54,62 @@ static float vektor_z = 0.1;
   static float pozicija_zelena_x = -0.4;
   static float pozicija_zuta_x = 0.4;
   */
-  static int odbijena = 0;
   
   
-  static void pomeriBelu(int x,int z){
-    /*pozicija_bela_z+=0.1;*/  
-
-    glutTimerFunc(TIMER_BELE, onTimerBela, TIMER_ID_BELA);
-    glutPostRedisplay();
-  
-}
-
 static void onTimerOstale(int id){
     if (id != TIMER_ID_OSTALE) {
         return;
     }
-    
-    
-/*    if(pozicija_zelena_z < 7 && pozicija_zelena_x > -3){
-      pozicija_zelena_z+=0.1;
-      pozicija_zelena_x-=0.1;
-    }
-    
-
-
-    if(pozicija_plava_z < 7 && pozicija_plava_x > -3){
-      pozicija_plava_z+=0.1;
-      pozicija_plava_x-=0.05;
-    }
-
-    if(pozicija_zuta_z < 7 && pozicija_zuta_x < 3){
-      pozicija_zuta_z+=0.1;
-      pozicija_zuta_x+=0.1;
-    }
-
-    if(((pozicija_crvena_z+0.1) == (pozicija_bela_z-0.1)) || ((pozicija_crvena_z-0.1) == (pozicija_bela_z+0.1)) || 
-       ((pozicija_crvena_x+0.1) == (pozicija_bela_x-0.1)) || ((pozicija_crvena_x-0.1) == (pozicija_bela_x+0.1))
-    ){
-    
-*/  
-
-    if(intenzitet >0){
-      /*
-      intenzitet-=0.1;
-      if((pozicija_crvena_z+0.2)<=duzina_stola && (vektor_z>0) && ((pozicija_crvena_x+0.2)<=sirina_stola) ){
-	pozicija_crvena_z += vektor_z;
-	pozicija_crvena_x += vektor_x;
-	glutPostRedisplay();
-      }
-      else{
-	odbijena=1;
-	pozicija_crvena_z -= vektor_z;
-	pozicija_crvena_x += vektor_x;
-	glutPostRedisplay();
-      }
-      */
       
-      intenzitet-=0.1;
+      if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && (intenzitet_bela>0) && 
+	(pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
+    ){
+      intenzitet_bela/=2;
+      intenzitet_crvena/=2;
+      vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
+      vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
+      vektor_x_bela*=(-1);
+      vektor_z_bela*=(-1);
+       
+    }
+    
+    if(intenzitet_crvena >0){
+
+      
+      intenzitet_crvena-=0.1;
       
       if((pozicija_crvena_x+0.2) >= sirina_stola)
-	vektor_x = vektor_x * (-1);
-      if((pozicija_crvena_x-0.2) <= 0)
-	vektor_x = vektor_x * (-1);
+	vektor_x_crvena = vektor_x_crvena * (-1);
+      if((pozicija_crvena_x -0.2) <= 0)
+	vektor_x_crvena = vektor_x_crvena * (-1);
       if((pozicija_crvena_z+0.2) >= duzina_stola)
-	vektor_z = vektor_z * (-1);
-      if((pozicija_crvena_z+0.2) <= 0)
-	vektor_z = vektor_z * (-1);
+	vektor_z_crvena = vektor_z_crvena * (-1);
+      if((pozicija_crvena_z-0.1) <= 0)
+	vektor_z_crvena = vektor_z_crvena * (-1);
       
-      pozicija_crvena_z += vektor_z;
-      pozicija_crvena_x += vektor_x;
+      pozicija_crvena_z += vektor_z_crvena;
+      pozicija_crvena_x += vektor_x_crvena;
       glutPostRedisplay();
-      
-      
-      /*
-      if(pozicija_crvena_z <= (pozicija_bela_z+0.2) && ((pozicija_crvena_z+0.2)<=duzina_stola) && (pozicija_bela_x > sirina_stola || pozicija_bela_x < 0) ){
-	vektor_x =  (pozicija_bela_x - pozicija_crvena_x);
-	vektor_z = (pozicija_bela_z - pozicija_crvena_z);
-	glutTimerFunc(TIMER_LOPTE,onTimerBela,TIMER_ID_BELA);
-      }
-      
-       * pozicija_crvena_x -= vektor_x;
-      */
     }
-    
+    if(intenzitet_bela>0){
+      intenzitet_bela-=0.1;
+      
+      if((pozicija_bela_x+0.2) >= sirina_stola)
+	vektor_x_bela = vektor_x_bela * (-1);
+      if((pozicija_bela_x-0.2 ) <= 0)
+	vektor_x_bela = vektor_x_bela * (-1);
+      if((pozicija_bela_z+0.2) >= duzina_stola)
+	vektor_z_bela = vektor_z_bela * (-1);
+      if((pozicija_bela_z+0.2) <= 0)
+	vektor_z_bela = vektor_z_bela * (-1);
+      
+      pozicija_bela_z += vektor_z_bela;
+      pozicija_bela_x += vektor_x_bela;
+      
+      glutPostRedisplay(); 
+      }
+
+      
       glutTimerFunc(TIMER_LOPTE, onTimerOstale, TIMER_ID_OSTALE);
 }
 
@@ -138,30 +119,44 @@ static void onTimerBela(int id)
         return;
     }
     
-    if((pozicija_bela_z <= (pozicija_crvena_z-0.2)) && (intenzitet>0)  ){
-      intenzitet-=0.1;
-      if(!(odbijena)){
-      pozicija_bela_x +=vektor_x;
-      pozicija_bela_z +=vektor_z;
-      }
-      else{
-	 pozicija_bela_x -=vektor_x;
-	 pozicija_bela_z -=vektor_z;
-      }
-      pomeriBelu(pozicija_bela_x,pozicija_bela_z);
-      glutPostRedisplay();
+    if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && (intenzitet_bela>0) && 
+	(pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
+    ){
+            vektor_z_crvena=(-1);
+      vektor_z_bela*=(-1);
+      TIMER_LOPTE *=2;
+      TIMER_BELE *=2;
+      intenzitet_bela/=2;
+      intenzitet_crvena/=2;
+      vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
+      vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
+      
+
+      
+        glutTimerFunc(TIMER_LOPTE,onTimerOstale,TIMER_ID_OSTALE);
+       
+    }
+    else
+    if(intenzitet_bela>0 ){
+      intenzitet_bela-=0.1;
+      
+      if((pozicija_bela_x+0.2) >= sirina_stola)
+	vektor_x_bela = vektor_x_bela * (-1);
+      if((pozicija_bela_x -0.2 ) <= 0)
+	vektor_x_bela = vektor_x_bela * (-1);
+      if((pozicija_bela_z+0.2) >= duzina_stola)
+	vektor_z_bela = vektor_z_bela * (-1);
+      if((pozicija_bela_z-0.2) <= 0)
+	vektor_z_bela = vektor_z_bela * (-1);
+      
+      pozicija_bela_z += vektor_z_bela;
+      pozicija_bela_x += vektor_x_bela;
+      
+      glutPostRedisplay(); 
+      glutTimerFunc(TIMER_BELE, onTimerBela, TIMER_ID_BELA);
+
     }
     
-    if((pozicija_bela_z >= (pozicija_crvena_z-0.2))){
-      vektor_x =  (pozicija_crvena_x - pozicija_bela_x);
-      vektor_z = (pozicija_crvena_z - pozicija_bela_z);
-      glutTimerFunc(TIMER_LOPTE,onTimerOstale,TIMER_ID_OSTALE);
-    }
-    
-    
-    
-    
-    /*glutTimerFunc(TIMER_LOPTE, onTimerOstale, TIMER_ID);*/
 }
 
 static void onTimer(int id)
@@ -169,7 +164,7 @@ static void onTimer(int id)
     if (id != TIMER_ID) {
         return;
     }
-    if((pozicija_stapa+duzina_stapa) < (pozicija_bela_z)){
+    if((pozicija_stapa+duzina_stapa+0.8) < (pozicija_bela_x)){
     ugao_kretanja+=1;
     pozicija_stapa -= sin(ugao_kretanja);
     glutPostRedisplay();
@@ -179,15 +174,7 @@ static void onTimer(int id)
 
       glutTimerFunc(TIMER_LOPTE,onTimerBela,TIMER_ID_BELA);
     }
-/*
-    if((pozicija_stapa+3.0) > (pozicija_bela_z) ){
-      glutTimerFunc(TIMER_LOPTE,onTimerBela,TIMER_ID_BELA);
-    }
 
-    if(pozicija_bela_z > 6.25){
-      glutTimerFunc(TIMER_LOPTE,onTimerOstale,TIMER_ID_OSTALE);
-    }
-*/
 
     
 
@@ -234,6 +221,11 @@ static void on_keyboard(unsigned char key, int x, int y)
 	  glutTimerFunc(TIMER,onTimer,TIMER_ID);
 	  udarena=0;
 	}
+        break;
+    }
+    case 'g':
+    case 'G':
+	rupe=1;
         break;
     }
 }
@@ -368,28 +360,28 @@ static void on_display(void)
     glPushMatrix();
     glTranslatef(0.0,-0.5,0.0);
     glColor3f(0,0,0);
-    glutSolidSphere(0.2,50,50);
+    glutSolidSphere(0.3,50,50);
     glFlush();
     glPopMatrix();
     
     glPushMatrix();
     glTranslatef(7.0,-0.5,0.0);
     glColor3f(0,0,0);
-    glutSolidSphere(0.2,50,50);
+    glutSolidSphere(0.3,50,50);
     glFlush();
     glPopMatrix();
     
     glPushMatrix();
     glTranslatef(0.0,-0.5,6.0);
     glColor3f(0,0,0);
-    glutSolidSphere(0.2,50,50);
+    glutSolidSphere(0.3,50,50);
     glFlush();
     glPopMatrix();
     
     glPushMatrix();
     glTranslatef(7.0,-0.5,6.0);
     glColor3f(0,0,0);
-    glutSolidSphere(0.2,50,50);
+    glutSolidSphere(0.3,50,50);
     glFlush();
     glPopMatrix();
     
@@ -409,7 +401,8 @@ static void on_display(void)
 
     /*crtanje stapa*/
     glPushMatrix();
-    glTranslatef(3.5,0.1,pozicija_stapa);
+    glRotatef(45,0,1,0);
+    glTranslatef(2.0,0.1,pozicija_stapa);
     glColor3f(0.5,0.25,0.0);
     GLUquadric* qobj = gluNewQuadric();
     gluCylinder(qobj,0.1,0.015,3,10,10);
@@ -431,29 +424,7 @@ static void on_display(void)
     glFlush();
     glPopMatrix();
 
-    /*
-    glPushMatrix();
-    glTranslatef(pozicija_plava_x,0.0,pozicija_plava_z);
-    glColor3f(0, 0, 1);
-    glutSolidSphere(0.2, 40, 40);
-    glFlush();
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(pozicija_zelena_x,0.0,pozicija_zelena_z);
-    glColor3f(0, 1, 0);
-    glutSolidSphere(0.2, 40, 40);
-    glFlush();
-    glPopMatrix();
     
-    glPushMatrix();
-    glTranslatef(pozicija_zuta_x,0.0,pozicija_zuta_z);
-    glColor3f(1, 1, 0);
-    glutSolidSphere(0.2, 40, 40);
-    glFlush();
-    glPopMatrix();
-    
-    */
     
     /* Nova slika se salje na ekran. */
     glutSwapBuffers();

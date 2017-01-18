@@ -36,8 +36,8 @@ static void onTimerBela(int id);
 static void onTimerOstale(int id);
 static void pomeri_stap(void);
 
-static int intenzitet_bela = 500;
-static int intenzitet_crvena = 500;
+static int intenzitet_bela = 350;
+static int intenzitet_crvena = 350;
 
 static int duzina_stola = 11;
 static int sirina_stola = 7;
@@ -67,6 +67,16 @@ static int ugao_kretanja = 0;
 
 static int udarena_bela = 0;
 static int pritisnuto_dugme = 0;
+
+static void on_keyboard(unsigned char key, int x, int y)
+{
+    switch (key) {
+    case 27:
+        /* Zavrsava se program. */
+        exit(0);
+        break;
+    }
+}
   
 void computePos(float deltaMove) {
 
@@ -81,11 +91,23 @@ static void onTimerOstale(int id){
         return;
     }
       
-      if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && (intenzitet_bela>0) && 
-    (pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
+      if((pozicija_bela_z <= (pozicija_crvena_z +0.2) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.2) ) && 
+    (pozicija_bela_x <= (pozicija_crvena_x +0.2) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.2) )
     ){
       intenzitet_bela/=2;
       intenzitet_crvena/=2;
+      vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
+      vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
+      vektor_x_bela*=(-1);
+      vektor_z_bela*=(-1);
+       
+    }
+    
+    if((pozicija_crvena_z <= (pozicija_bela_z +0.2) ) && (pozicija_crvena_z >= (pozicija_bela_z -0.2) ) && 
+    (pozicija_crvena_x <= (pozicija_bela_x +0.2) ) && (pozicija_crvena_x >= (pozicija_bela_x -0.2) )
+    ){
+      intenzitet_crvena/=2;
+      intenzitet_bela=intenzitet_crvena;
       vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
       vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
       vektor_x_bela*=(-1);
@@ -139,10 +161,10 @@ static void onTimerBela(int id)
         return;
     }
     
-    if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && (intenzitet_bela>0) && 
+    if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && 
     (pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
     ){
-            vektor_z_crvena=(-1);
+      vektor_z_crvena=(-1);
       vektor_z_bela*=(-1);
       TIMER_LOPTE *=2;
       TIMER_BELE *=2;
@@ -156,7 +178,7 @@ static void onTimerBela(int id)
         glutTimerFunc(TIMER_LOPTE,onTimerOstale,TIMER_ID_OSTALE);
        
     }
-    else
+    
     if(intenzitet_bela>0 ){
       intenzitet_bela-=0.1;
       
@@ -186,7 +208,7 @@ static void onTimer(int id)
     }
     
     
-    if(((pozicija_stapa_z-2.2) > (pozicija_bela_z)) || (((pozicija_stapa_x-2.2) > (pozicija_bela_x)) ) ){
+    if(((pozicija_stapa_z-2.2) > (pozicija_bela_z)) && (((pozicija_stapa_x-2.2) > (pozicija_bela_x)) ) ){
     pozicija_stapa_z += (vektor_z_bela);
     pozicija_stapa_x += (vektor_x_bela);
     glutPostRedisplay();
@@ -195,6 +217,40 @@ static void onTimer(int id)
     else{
       udarena_bela = 1;
       glutTimerFunc(TIMER_LOPTE,onTimerBela,TIMER_ID_BELA);
+    }
+}
+
+
+
+void SpecialInput(int key, int x, int y)
+{
+    switch (key) {
+    case 27:
+        /* Zavrsava se program. */
+        exit(0);
+        break;
+
+    case GLUT_KEY_UP:
+      pozicija_stapa_z-=100;
+      if(!udarena_bela)
+      glutTimerFunc(TIMER,onTimer,TIMER_ID);
+        break;
+        
+    case GLUT_KEY_LEFT:
+    ugao_kretanja-=1;
+    pritisnuto_dugme=1;
+    glutPostRedisplay();
+    pomeri_stap();
+    glutDisplayFunc(on_display);
+        break;
+        
+    case GLUT_KEY_RIGHT:
+    ugao_kretanja+=1;
+    pritisnuto_dugme=1;
+        glutPostRedisplay();
+    pomeri_stap();
+    glutDisplayFunc(on_display);
+        break;
     }
 }
 
@@ -210,14 +266,15 @@ int main(int argc, char **argv)
     glutCreateWindow(argv[0]);
 
     /* Registruju se callback funkcije. */
+    
     glutKeyboardFunc(on_keyboard);
+	glutSpecialFunc(SpecialInput);
     glutReshapeFunc(on_reshape);
     glutDisplayFunc(on_display);
 
     
 
     /* Obavlja se OpenGL inicijalizacija. */
-    glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
 
     /* Program ulazi u glavnu petlju. */
@@ -267,40 +324,7 @@ static void pomeri_stap(void){
 
 }
 
-static void on_keyboard(unsigned char key, int x, int y)
-{
-    switch (key) {
-    case 27:
-        /* Zavrsava se program. */
-        exit(0);
-        break;
 
-    case 'g':
-    case 'G':
-      
-      pozicija_stapa_z-=100;
-      if(!udarena_bela)
-      glutTimerFunc(TIMER,onTimer,TIMER_ID);
-      
-        break;
-    case 'a':
-    case 'A':
-    ugao_kretanja-=1;
-    pritisnuto_dugme=1;
-    glutPostRedisplay();
-    pomeri_stap();
-    glutDisplayFunc(on_display);
-        break;
-    case 'd':
-    case 'D':
-    ugao_kretanja+=1;
-    pritisnuto_dugme=1;
-        glutPostRedisplay();
-    pomeri_stap();
-    glutDisplayFunc(on_display);
-        break;
-    }
-}
 
 static void on_reshape(int width, int height)
 {

@@ -13,6 +13,18 @@ static void on_display(void);
 #define TIMER_ID_OSTALE 3
 #define PI 3.14159265
 
+float angle = 0.0f;
+
+float lx=0.0f,lz=-1.0f;
+
+float x=0.0f, z=5.0f;
+
+float deltaAngle = 0.0f;
+float deltaMove = 0;
+int xOrigin = -1;
+
+
+
 static float val = PI / 180.0;
 
 static int TIMER = 25;
@@ -24,14 +36,17 @@ static void onTimerBela(int id);
 static void onTimerOstale(int id);
 static void pomeri_stap(void);
 
-static int intenzitet_bela = 1700000000;
-static int intenzitet_crvena = 1700000000;
+static int intenzitet_bela = 500;
+static int intenzitet_crvena = 500;
 
 static int duzina_stola = 11;
 static int sirina_stola = 7;
 
 static float vektor_x_bela = 0.0;
-static float vektor_z_bela = 0.1;
+static float vektor_z_bela = 0.2;
+
+static float vektor_pravca_x_bela = 0.0;
+static float vektor_pravca_z_bela = 0.1;
 
 static float pozicija_stapa_x ;
 static float pozicija_stapa_z ;
@@ -53,6 +68,13 @@ static int ugao_kretanja = 0;
 static int udarena_bela = 0;
 static int pritisnuto_dugme = 0;
   
+void computePos(float deltaMove) {
+
+    x += deltaMove * vektor_x_bela * 0.1f;
+    z += deltaMove * vektor_z_bela * 0.1f;
+}  
+
+
 
 static void onTimerOstale(int id){
     if (id != TIMER_ID_OSTALE) {
@@ -60,7 +82,7 @@ static void onTimerOstale(int id){
     }
       
       if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && (intenzitet_bela>0) && 
-	(pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
+    (pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
     ){
       intenzitet_bela/=2;
       intenzitet_crvena/=2;
@@ -77,13 +99,13 @@ static void onTimerOstale(int id){
       intenzitet_crvena-=0.1;
       
       if((pozicija_crvena_x+0.2) >= sirina_stola)
-	vektor_x_crvena = vektor_x_crvena * (-1);
+    vektor_x_crvena = vektor_x_crvena * (-1);
       if((pozicija_crvena_x -0.2) <= 0)
-	vektor_x_crvena = vektor_x_crvena * (-1);
+    vektor_x_crvena = vektor_x_crvena * (-1);
       if((pozicija_crvena_z+0.2) >= duzina_stola)
-	vektor_z_crvena = vektor_z_crvena * (-1);
+    vektor_z_crvena = vektor_z_crvena * (-1);
       if((pozicija_crvena_z-0.1) <= 0)
-	vektor_z_crvena = vektor_z_crvena * (-1);
+    vektor_z_crvena = vektor_z_crvena * (-1);
       
       pozicija_crvena_z += vektor_z_crvena;
       pozicija_crvena_x += vektor_x_crvena;
@@ -93,13 +115,13 @@ static void onTimerOstale(int id){
       intenzitet_bela-=0.1;
       
       if((pozicija_bela_x+0.2) >= sirina_stola)
-	vektor_x_bela = vektor_x_bela * (-1);
+    vektor_x_bela = vektor_x_bela * (-1);
       if((pozicija_bela_x-0.2 ) <= 0)
-	vektor_x_bela = vektor_x_bela * (-1);
+    vektor_x_bela = vektor_x_bela * (-1);
       if((pozicija_bela_z+0.2) >= duzina_stola)
-	vektor_z_bela = vektor_z_bela * (-1);
+    vektor_z_bela = vektor_z_bela * (-1);
       if((pozicija_bela_z+0.2) <= 0)
-	vektor_z_bela = vektor_z_bela * (-1);
+    vektor_z_bela = vektor_z_bela * (-1);
       
       pozicija_bela_z += (vektor_z_bela/30);
       pozicija_bela_x += (vektor_x_bela/30);
@@ -118,7 +140,7 @@ static void onTimerBela(int id)
     }
     
     if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && (intenzitet_bela>0) && 
-	(pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
+    (pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
     ){
             vektor_z_crvena=(-1);
       vektor_z_bela*=(-1);
@@ -130,7 +152,7 @@ static void onTimerBela(int id)
       vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
       
 
-	glutPostRedisplay();
+    glutPostRedisplay();
         glutTimerFunc(TIMER_LOPTE,onTimerOstale,TIMER_ID_OSTALE);
        
     }
@@ -139,13 +161,13 @@ static void onTimerBela(int id)
       intenzitet_bela-=0.1;
       
       if((pozicija_bela_x+0.2) >= sirina_stola)
-	vektor_x_bela = vektor_x_bela * (-1);
+    vektor_x_bela = vektor_x_bela * (-1);
       if((pozicija_bela_x -0.2 ) <= 0)
-	vektor_x_bela = vektor_x_bela * (-1);
+    vektor_x_bela = vektor_x_bela * (-1);
       if((pozicija_bela_z+0.2) >= duzina_stola)
-	vektor_z_bela = vektor_z_bela * (-1);
+    vektor_z_bela = vektor_z_bela * (-1);
       if((pozicija_bela_z-0.2) <= 0)
-	vektor_z_bela = vektor_z_bela * (-1);
+    vektor_z_bela = vektor_z_bela * (-1);
       
       pozicija_bela_z += (vektor_z_bela/30);
       pozicija_bela_x += (vektor_x_bela/30);
@@ -192,6 +214,8 @@ int main(int argc, char **argv)
     glutReshapeFunc(on_reshape);
     glutDisplayFunc(on_display);
 
+    
+
     /* Obavlja se OpenGL inicijalizacija. */
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
@@ -202,18 +226,45 @@ int main(int argc, char **argv)
     return 0;
 }
 
+
 static void pomeri_stap(void){
   
-  if(!(udarena_bela)){	    
+  if(!(udarena_bela)){      
     /*pozicioniranje stapa*/
     pozicija_stapa_x = (pozicija_bela_x + ( duzina_stapa * (sin(ugao_kretanja*val)) ) );
     pozicija_stapa_z = (pozicija_bela_z - ( duzina_stapa * (cos(ugao_kretanja*val)) ) );
 
     vektor_x_bela = -(pozicija_stapa_x - pozicija_bela_x);
     vektor_z_bela = -(pozicija_stapa_z - pozicija_bela_z);
+    
+    vektor_pravca_x_bela = vektor_x_bela;
+    vektor_pravca_z_bela = vektor_z_bela;
+    
+    glLineWidth(1.5); 
+    glColor3f(1.0, 1.0, 1.0);
+    glBegin(GL_LINES);
+    glVertex3f(pozicija_stapa_x, 0.0, pozicija_stapa_z);
+    glVertex3f( pozicija_stapa_x+vektor_x_bela*3, 0, pozicija_stapa_z+vektor_z_bela*3);
+    glEnd();
+    
+    /*
+        if(pozicija_stapa_x+vektor_x_bela*3 >= sirina_stola-0.4 ){
+        vektor_pravca_x_bela*=(-1);
+        
+        glLineWidth(1.5); 
+        glColor3f(1.0, 1.0, 1.0);
+        glBegin(GL_LINES);
+        
+        glVertex3f(sirina_stola + sirina_stola-(pozicija_stapa_x+vektor_x_bela*3), 0.1, pozicija_stapa_z+vektor_pravca_z_bela*3);
+        vektor_pravca_z_bela*=(2);
+        glVertex3f( pozicija_stapa_x+vektor_pravca_x_bela*3, 0.1, pozicija_stapa_z+vektor_pravca_z_bela*3);
+        
+        glutPostRedisplay();
+        glEnd();
+        }
+        */
     }
-    glutPostRedisplay();
-  
+
 }
 
 static void on_keyboard(unsigned char key, int x, int y)
@@ -227,26 +278,26 @@ static void on_keyboard(unsigned char key, int x, int y)
     case 'g':
     case 'G':
       
-	  pozicija_stapa_z-=100;
-	  if(!udarena_bela)
-	  glutTimerFunc(TIMER,onTimer,TIMER_ID);
-	  
+      pozicija_stapa_z-=100;
+      if(!udarena_bela)
+      glutTimerFunc(TIMER,onTimer,TIMER_ID);
+      
         break;
     case 'a':
     case 'A':
-	ugao_kretanja+=15;
-	pritisnuto_dugme=1;
-	glutPostRedisplay();
-	pomeri_stap();
-	glutDisplayFunc(on_display);
+    ugao_kretanja-=1;
+    pritisnuto_dugme=1;
+    glutPostRedisplay();
+    pomeri_stap();
+    glutDisplayFunc(on_display);
         break;
     case 'd':
     case 'D':
-	ugao_kretanja-=15;
-	pritisnuto_dugme=1;
+    ugao_kretanja+=1;
+    pritisnuto_dugme=1;
         glutPostRedisplay();
-	pomeri_stap();
-	glutDisplayFunc(on_display);
+    pomeri_stap();
+    glutDisplayFunc(on_display);
         break;
     }
 }
@@ -259,13 +310,16 @@ static void on_reshape(int width, int height)
     /* Podesava se projekcija. */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (float) width / height, 1, 20);
+    gluPerspective(60, (float) width / height, 1, 25);
 }
 
 
 
 static void on_display(void)
 {
+    
+    if (deltaMove)
+        computePos(deltaMove);
   
     /* Pozicija svetla (u pitanju je direkcionalno svetlo). */
     GLfloat light_position[] = { 0, 5, 0, 0 };
@@ -297,6 +351,9 @@ static void on_display(void)
     /* Podesava se vidna tacka. */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    if(!udarena_bela)
+    gluLookAt(pozicija_stapa_x-vektor_x_bela*3, 10, pozicija_stapa_z-vektor_z_bela, 3+vektor_x_bela*3, 0, 3+vektor_z_bela, 0, 1, 0);
+    else
     gluLookAt(3, 10, -5, 3, 0, 3, 0, 1, 0);
 
     /* Ukljucuje se osvjetljenje i podesavaju parametri svetla. */
@@ -319,7 +376,7 @@ static void on_display(void)
     glShadeModel(GL_SMOOTH);
     
     /*crtanje stola*/
-    glPushMatrix();
+        glPushMatrix();
     glTranslatef(0.0,0.0,-1.5);
     glBegin(GL_POLYGON); 
     glColor3d(0.0,1.0,0.4);
@@ -447,11 +504,9 @@ static void on_display(void)
     glColor3f(0.5,0.25,0.0);
     GLUquadric* qobj = gluNewQuadric();
     gluCylinder(qobj,0.1,0.015,duzina_stapa,10,10);   
-    glFlush();
+    glutPostRedisplay();
     glPopMatrix();
     pomeri_stap();
-    
-
     /* Nova slika se salje na ekran. */
     glutSwapBuffers();
 

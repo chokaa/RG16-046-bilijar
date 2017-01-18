@@ -96,8 +96,8 @@ static void onTimerOstale(int id){
     ){
       intenzitet_bela/=2;
       intenzitet_crvena/=2;
-      vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
-      vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
+      vektor_x_crvena  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
+      vektor_z_crvena = (pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
       vektor_x_bela*=(-1);
       vektor_z_bela*=(-1);
        
@@ -108,8 +108,8 @@ static void onTimerOstale(int id){
     ){
       intenzitet_crvena/=2;
       intenzitet_bela=intenzitet_crvena;
-      vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
-      vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
+      vektor_x_crvena  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
+      vektor_z_crvena = (pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
       vektor_x_bela*=(-1);
       vektor_z_bela*=(-1);
        

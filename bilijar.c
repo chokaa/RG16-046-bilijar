@@ -36,8 +36,8 @@ static void onTimerBela(int id);
 static void onTimerOstale(int id);
 static void pomeri_stap(void);
 
-static int intenzitet_bela = 350;
-static int intenzitet_crvena = 350;
+static int intenzitet_bela = 650;
+static int intenzitet_crvena = 650;
 
 static int duzina_stola = 11;
 static int sirina_stola = 7;
@@ -94,12 +94,12 @@ static void onTimerOstale(int id){
       if((pozicija_bela_z <= (pozicija_crvena_z +0.2) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.2) ) && 
     (pozicija_bela_x <= (pozicija_crvena_x +0.2) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.2) )
     ){
-      intenzitet_bela/=2;
       intenzitet_crvena/=2;
-      vektor_x_crvena  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
+      intenzitet_bela=intenzitet_crvena;
+	  vektor_x_crvena  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
       vektor_z_crvena = (pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
-      vektor_x_bela*=(-1);
-      vektor_z_bela*=(-1);
+      vektor_x_bela  =  (pozicija_bela_x - pozicija_crvena_x);
+      vektor_z_bela = -(pozicija_bela_z - pozicija_crvena_z);
        
     }
     
@@ -110,8 +110,8 @@ static void onTimerOstale(int id){
       intenzitet_bela=intenzitet_crvena;
       vektor_x_crvena  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
       vektor_z_crvena = (pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
-      vektor_x_bela*=(-1);
-      vektor_z_bela*=(-1);
+      vektor_x_bela  =  (pozicija_bela_x - pozicija_crvena_x);
+      vektor_z_bela = -(pozicija_bela_z - pozicija_crvena_z);
        
     }
     
@@ -145,8 +145,8 @@ static void onTimerOstale(int id){
       if((pozicija_bela_z+0.2) <= 0)
     vektor_z_bela = vektor_z_bela * (-1);
       
-      pozicija_bela_z += (vektor_z_bela/30);
-      pozicija_bela_x += (vektor_x_bela/30);
+      pozicija_bela_z += (vektor_z_bela/5);
+      pozicija_bela_x += (vektor_x_bela/5);
       
       glutPostRedisplay(); 
       }
@@ -165,13 +165,14 @@ static void onTimerBela(int id)
     (pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
     ){
       vektor_z_crvena=(-1);
-      vektor_z_bela*=(-1);
       TIMER_LOPTE *=2;
-      TIMER_BELE *=2;
-      intenzitet_bela/=2;
+      intenzitet_bela-=5;
       intenzitet_crvena/=2;
       vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
       vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
+      
+      vektor_x_bela  =  (pozicija_bela_x - pozicija_crvena_x);
+      vektor_z_bela = -(pozicija_bela_z - pozicija_crvena_z);
       
 
     glutPostRedisplay();

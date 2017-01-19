@@ -36,14 +36,14 @@ static void onTimerBela(int id);
 static void onTimerOstale(int id);
 static void pomeri_stap(void);
 
-static int intenzitet_bela = 650;
-static int intenzitet_crvena = 650;
+static int intenzitet_bela = 500;
+static int intenzitet_crvena = 500;
 
 static int duzina_stola = 11;
 static int sirina_stola = 7;
 
 static float vektor_x_bela = 0.0;
-static float vektor_z_bela = 0.2;
+static float vektor_z_bela = 0.0;
 
 static float vektor_pravca_x_bela = 0.0;
 static float vektor_pravca_z_bela = 0.1;
@@ -91,41 +91,45 @@ static void onTimerOstale(int id){
         return;
     }
       
-      if((pozicija_bela_z <= (pozicija_crvena_z +0.2) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.2) ) && 
+      if((pozicija_bela_z >= (pozicija_crvena_z +0.2) ) && (pozicija_bela_z <= (pozicija_crvena_z -0.2) ) && 
     (pozicija_bela_x <= (pozicija_crvena_x +0.2) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.2) )
     ){
-      intenzitet_crvena/=2;
-      intenzitet_bela=intenzitet_crvena;
-	  vektor_x_crvena  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
-      vektor_z_crvena = (pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
-      vektor_x_bela  =  (pozicija_bela_x - pozicija_crvena_x);
-      vektor_z_bela = -(pozicija_bela_z - pozicija_crvena_z);
-       
+      intenzitet_bela/=2;
+      intenzitet_crvena=intenzitet_bela/2;
+      vektor_x_crvena  =  (pozicija_bela_x+0.2 - pozicija_bela_x-0.2);
+      vektor_z_crvena = -(pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
+      vektor_x_bela  =  (pozicija_bela_x+0.2 - pozicija_crvena_x-0.2);
+      vektor_z_bela = -(pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
+      
     }
     
-    if((pozicija_crvena_z <= (pozicija_bela_z +0.2) ) && (pozicija_crvena_z >= (pozicija_bela_z -0.2) ) && 
+    if((pozicija_crvena_z >= (pozicija_bela_z +0.2) ) && (pozicija_crvena_z <= (pozicija_bela_z -0.2) ) && 
     (pozicija_crvena_x <= (pozicija_bela_x +0.2) ) && (pozicija_crvena_x >= (pozicija_bela_x -0.2) )
     ){
       intenzitet_crvena/=2;
-      intenzitet_bela=intenzitet_crvena;
+      intenzitet_bela=intenzitet_crvena/2;
       vektor_x_crvena  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
-      vektor_z_crvena = (pozicija_crvena_z+0.2 - pozicija_bela_z-0.2);
-      vektor_x_bela  =  (pozicija_bela_x - pozicija_crvena_x);
-      vektor_z_bela = -(pozicija_bela_z - pozicija_crvena_z);
+      vektor_z_crvena = -(pozicija_bela_z+0.2 - pozicija_crvena_z-0.2);
+      vektor_x_bela  =  (pozicija_crvena_x+0.2 - pozicija_bela_x-0.2);
+      vektor_z_bela = -(pozicija_bela_z+0.2 - pozicija_crvena_z-0.2);
+      
        
     }
     
-    if(intenzitet_crvena >0){
+    if(intenzitet_crvena >0 && intenzitet_bela>0){
 
       
-      intenzitet_crvena-=0.1;
+      intenzitet_crvena-=0.2;
       
       if((pozicija_crvena_x+0.2) >= sirina_stola)
     vektor_x_crvena = vektor_x_crvena * (-1);
+      else
       if((pozicija_crvena_x -0.2) <= 0)
     vektor_x_crvena = vektor_x_crvena * (-1);
+      else
       if((pozicija_crvena_z+0.2) >= duzina_stola)
     vektor_z_crvena = vektor_z_crvena * (-1);
+      else
       if((pozicija_crvena_z-0.1) <= 0)
     vektor_z_crvena = vektor_z_crvena * (-1);
       
@@ -133,8 +137,8 @@ static void onTimerOstale(int id){
       pozicija_crvena_x += vektor_x_crvena;
       glutPostRedisplay();
     }
-    if(intenzitet_bela>0){
-      intenzitet_bela-=0.1;
+    if(intenzitet_bela>0 && intenzitet_crvena>0){
+      intenzitet_bela-=0.2;
       
       if((pozicija_bela_x+0.2) >= sirina_stola)
     vektor_x_bela = vektor_x_bela * (-1);
@@ -142,11 +146,11 @@ static void onTimerOstale(int id){
     vektor_x_bela = vektor_x_bela * (-1);
       if((pozicija_bela_z+0.2) >= duzina_stola)
     vektor_z_bela = vektor_z_bela * (-1);
-      if((pozicija_bela_z+0.2) <= 0)
+      if((pozicija_bela_z-0.1) <= 0)
     vektor_z_bela = vektor_z_bela * (-1);
       
-      pozicija_bela_z += (vektor_z_bela/5);
-      pozicija_bela_x += (vektor_x_bela/5);
+      pozicija_bela_z += (vektor_z_bela)/3;
+      pozicija_bela_x += (vektor_x_bela)/3  ;
       
       glutPostRedisplay(); 
       }
@@ -161,18 +165,17 @@ static void onTimerBela(int id)
         return;
     }
     
-    if((pozicija_bela_z <= (pozicija_crvena_z +0.45) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.45) ) && 
-    (pozicija_bela_x <= (pozicija_crvena_x +0.45) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.45) )
+    if((pozicija_bela_z <= (pozicija_crvena_z +0.25) ) && (pozicija_bela_z >= (pozicija_crvena_z -0.25) ) && 
+    (pozicija_bela_x <= (pozicija_crvena_x +0.25) ) && (pozicija_bela_x >= (pozicija_crvena_x -0.25) )
     ){
-      vektor_z_crvena=(-1);
-      TIMER_LOPTE *=2;
+      TIMER_LOPTE *=1.5;
       intenzitet_bela-=5;
       intenzitet_crvena/=2;
-      vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x);
-      vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z);
+      vektor_x_crvena  =  (pozicija_crvena_x - pozicija_bela_x)/2;
+      vektor_z_crvena = (pozicija_crvena_z - pozicija_bela_z)/2;
       
-      vektor_x_bela  =  (pozicija_bela_x - pozicija_crvena_x);
-      vektor_z_bela = -(pozicija_bela_z - pozicija_crvena_z);
+      vektor_x_bela  =  (pozicija_bela_x - pozicija_crvena_x)/2;
+      vektor_z_bela = -(pozicija_bela_z - pozicija_crvena_z)/2;
       
 
     glutPostRedisplay();
@@ -180,7 +183,7 @@ static void onTimerBela(int id)
        
     }
     
-    if(intenzitet_bela>0 ){
+    if(intenzitet_bela>0 && intenzitet_crvena > 0 ){
       intenzitet_bela-=0.1;
       
       if((pozicija_bela_x+0.2) >= sirina_stola)
@@ -192,8 +195,8 @@ static void onTimerBela(int id)
       if((pozicija_bela_z-0.2) <= 0)
     vektor_z_bela = vektor_z_bela * (-1);
       
-      pozicija_bela_z += (vektor_z_bela/30);
-      pozicija_bela_x += (vektor_x_bela/30);
+      pozicija_bela_z += (vektor_z_bela/20);
+      pozicija_bela_x += (vektor_x_bela/20);
       
       glutPostRedisplay(); 
       glutTimerFunc(TIMER_BELE, onTimerBela, TIMER_ID_BELA);
@@ -269,7 +272,7 @@ int main(int argc, char **argv)
     /* Registruju se callback funkcije. */
     
     glutKeyboardFunc(on_keyboard);
-	glutSpecialFunc(SpecialInput);
+    glutSpecialFunc(SpecialInput);
     glutReshapeFunc(on_reshape);
     glutDisplayFunc(on_display);
 
